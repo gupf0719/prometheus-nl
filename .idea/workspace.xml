@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="6bd70aeb-119e-48e0-8030-4b9abf4207b8" name="默认的" comment="">
+      <change beforePath="$PROJECT_DIR$/pkg/labels/labels.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/labels/labels.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/promql/functions.go" beforeDir="false" afterPath="$PROJECT_DIR$/promql/functions.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/strutil/strconv.go" beforeDir="false" afterPath="$PROJECT_DIR$/util/strutil/strconv.go" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Go File" />
+      </list>
+    </option>
+  </component>
+  <component name="GOROOT" path="/usr/local/Cellar/go/1.15.3/libexec" />
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GoLibraries">
+    <option name="indexEntireGoPath" value="false" />
+  </component>
+  <component name="KubernetesApiPersistence">
+    <option name="context" value="minikube" />
+    <option name="namespace" value="default" />
+  </component>
+  <component name="ProjectId" id="1lgdohgvpqeR9GQtYxCLCawWmRc" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="DefaultGoTemplateProperty" value="Go File" />
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="go.import.settings.migrated" value="true" />
+    <property name="go.sdk.automatically.set" value="true" />
+    <property name="go.tried.to.enable.integration.vgo.integrator" value="true" />
+    <property name="go.vendoring.notification.had.been.shown" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="node.js.detected.package.eslint" value="true" />
+    <property name="node.js.path.for.package.eslint" value="project" />
+    <property name="node.js.selected.package.eslint" value="(autodetect)" />
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="6bd70aeb-119e-48e0-8030-4b9abf4207b8" name="默认的" comment="" />
+      <created>1608022844462</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1608022844462</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="VgoProject">
+    <integration-enabled>true</integration-enabled>
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="373" y="470" width="524" height="522" key="find.popup" timestamp="1608089083026">
+      <screen x="0" y="23" width="2560" height="1417" />
+    </state>
+    <state x="373" y="470" width="524" height="522" key="find.popup/0.23.2560.1417@0.23.2560.1417" timestamp="1608089083026" />
+  </component>
+</project>
