@@ -268,6 +268,104 @@ var Functions = map[string]*Function{
 		Variadic:   1,
 		ReturnType: ValueTypeVector,
 	},
+
+	//newland
+	"labels_append_ternary": {
+		Name:       "labels_append_ternary",
+		ArgTypes:   []ValueType{ValueTypeVector, ValueTypeString, ValueTypeString},
+		Variadic:   -1,
+		ReturnType: ValueTypeVector,
+	},
+	"labels_append_tags": {
+		Name:       "labels_append_tags",
+		ArgTypes:   []ValueType{ValueTypeVector, ValueTypeString, ValueTypeString},
+		Variadic:   -1,
+		ReturnType: ValueTypeVector,
+	},
+	"labels_rename": {
+		Name:       "labels_rename",
+		ArgTypes:   []ValueType{ValueTypeVector, ValueTypeString, ValueTypeString},
+		Variadic:   -1,
+		ReturnType: ValueTypeVector,
+	},
+	"labels_select": {
+		Name:       "labels_select",
+		ArgTypes:   []ValueType{ValueTypeVector, ValueTypeString},
+		Variadic:   -1,
+		ReturnType: ValueTypeVector,
+	},
+	"select1": {
+		Name:       "select1",
+		ArgTypes:   []ValueType{ValueTypeVector, ValueTypeString},
+		Variadic:   -1,
+		ReturnType: ValueTypeVector,
+	},
+	"select2": {
+		Name:       "select2",
+		ArgTypes:   []ValueType{ValueTypeString, ValueTypeVector, ValueTypeVector, ValueTypeString},
+		Variadic:   -1,
+		ReturnType: ValueTypeVector,
+	},
+	"labels_append": {
+		Name:       "labels_append",
+		ArgTypes:   []ValueType{ValueTypeVector, ValueTypeVector, ValueTypeString, ValueTypeString, ValueTypeString},
+		Variadic:   -1,
+		ReturnType: ValueTypeVector,
+	},
+	"select2_join": {
+		Name:       "select2_join",
+		ArgTypes:   []ValueType{ValueTypeString, ValueTypeVector, ValueTypeVector, ValueTypeString},
+		Variadic:   -1,
+		ReturnType: ValueTypeVector,
+	},
+	"distinct": {
+		Name:       "distinct",
+		ArgTypes:   []ValueType{ValueTypeVector, ValueTypeString},
+		Variadic:   -1,
+		ReturnType: ValueTypeVector,
+	},
+	"aggregate_matrix_max": {
+		Name:     "aggregate_matrix_max",
+		ArgTypes: []ValueType{ValueTypeMatrix},
+		//Variadic:   -1,
+		ReturnType: ValueTypeVector,
+	},
+	"aggregate_matrix_min": {
+		Name:     "aggregate_matrix_min",
+		ArgTypes: []ValueType{ValueTypeMatrix},
+		//Variadic:   -1,
+		ReturnType: ValueTypeVector,
+	},
+	"aggregate_matrix_sum": {
+		Name:     "aggregate_matrix_sum",
+		ArgTypes: []ValueType{ValueTypeMatrix},
+		//Variadic:   -1,
+		ReturnType: ValueTypeVector,
+	},
+	"labels_append_value": {
+		Name:       "labels_append_value",
+		ArgTypes:   []ValueType{ValueTypeVector, ValueTypeVector, ValueTypeString, ValueTypeString},
+		Variadic:   -1,
+		ReturnType: ValueTypeVector,
+	},
+	"labels_append_values": {
+		Name:       "labels_append_values",
+		ArgTypes:   []ValueType{ValueTypeString, ValueTypeString, ValueTypeVector, ValueTypeVector},
+		Variadic:   -1,
+		ReturnType: ValueTypeVector,
+	},
+	"selectn": {
+		Name:       "selectn",
+		ArgTypes:   []ValueType{ValueTypeString, ValueTypeString, ValueTypeVector, ValueTypeVector},
+		Variadic:   -1,
+		ReturnType: ValueTypeVector,
+	},
+	"labels_invert": {
+		Name:       "labels_invert",
+		ArgTypes:   []ValueType{ValueTypeVector, ValueTypeString, ValueTypeString},
+		Variadic:   -1,
+		ReturnType: ValueTypeVector,
+	},
 }
 
 // getFunction returns a predefined Function object for the given name.
