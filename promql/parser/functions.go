@@ -366,6 +366,18 @@ var Functions = map[string]*Function{
 		Variadic:   -1,
 		ReturnType: ValueTypeVector,
 	},
+	"vector_with_labels": {
+		Name:       "vector_with_labels",
+		ArgTypes:   []ValueType{ValueTypeScalar, ValueTypeString, ValueTypeString},
+		Variadic:   -1,
+		ReturnType: ValueTypeVector,
+	},
+	"vector_join": {
+		Name:       "vector_join",
+		ArgTypes:   []ValueType{ValueTypeVector, ValueTypeVector},
+		Variadic:   -1,
+		ReturnType: ValueTypeVector,
+	},
 }
 
 // getFunction returns a predefined Function object for the given name.

@@ -1011,3 +1011,45 @@ out:
 	}
 	return enh.Out
 }
+
+// === Vector(s Scalar) Vector === //pengsg
+func funcVectorWithLabels(vals []parser.Value, args parser.Expressions, enh *EvalNodeHelper) Vector {
+
+	var (
+		v = vals[0].(Vector)[0].V
+	)
+
+	metriclabels := make(labels.Labels, 0, len(args)/2)
+	var isKey = true
+	var l *labels.Label
+	for i := 1; i < len(args); i++ {
+		src := args[i].(*parser.StringLiteral).Val
+		if isKey {
+			if !model.LabelName(src).IsValid() {
+				panic(fmt.Errorf("invalid source label name in vector_with_labels(): %s", src))
+			}
+			l = &labels.Label{}
+			l.Name = src
+			isKey = false
+		} else {
+			l.Value = src
+			metriclabels = append(metriclabels, *l)
+			isKey = true
+		}
+
+	}
+
+	return append(enh.Out,
+		Sample{
+			Metric: metriclabels,
+			Point:  Point{V: v},
+		})
+}
+
+// funcVectorJoin
+func funcVectorJoin(vals []parser.Value, args parser.Expressions, enh *EvalNodeHelper) Vector {
+	for _, v := range vals {
+		enh.Out = append(enh.Out, v.(Vector)...)
+	}
+	return enh.Out
+}

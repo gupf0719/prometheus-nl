@@ -954,6 +954,8 @@ var FunctionCalls = map[string]FunctionCall{
 	"labels_append_values":		funcLabelsAppendValue2,
 	"selectn": 					funcSelectn,
 	"labels_invert":			funcLabelsInvert,
+	"vector_with_labels":		funcVectorWithLabels,
+	"vector_join":				funcVectorJoin,
 }
 
 type vectorByValueHeap Vector

@@ -2,9 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="6bd70aeb-119e-48e0-8030-4b9abf4207b8" name="默认的" comment="">
-      <change beforePath="$PROJECT_DIR$/pkg/labels/labels.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/labels/labels.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/promql/functions.go" beforeDir="false" afterPath="$PROJECT_DIR$/promql/functions.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/strutil/strconv.go" beforeDir="false" afterPath="$PROJECT_DIR$/util/strutil/strconv.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/promql/functions_nl.go" beforeDir="false" afterPath="$PROJECT_DIR$/promql/functions_nl.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/promql/parser/functions.go" beforeDir="false" afterPath="$PROJECT_DIR$/promql/parser/functions.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
