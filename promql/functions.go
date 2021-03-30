@@ -14,6 +14,7 @@
 package promql
 
 import (
+	"fmt"
 	"math"
 	"regexp"
 	"sort"
@@ -185,7 +186,11 @@ func instantValue(vals []parser.Value, out Vector, isRate bool) Vector {
 		// Convert to per-second.
 		resultValue /= float64(sampledInterval) / 1000
 	}
-
+	if resultValue >100000{
+		fmt.Println("irate samples : ",samples.Points)
+		fmt.Println("irate previousSample : ",samples.Points[len(samples.Points)-2])
+		fmt.Println("irate lastSample : ",samples.Points[len(samples.Points)-1])
+	}
 	return append(out, Sample{
 		Point: Point{V: resultValue},
 	})

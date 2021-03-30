@@ -4,8 +4,6 @@
     <list default="true" id="6bd70aeb-119e-48e0-8030-4b9abf4207b8" name="默认的" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/promql/functions.go" beforeDir="false" afterPath="$PROJECT_DIR$/promql/functions.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/promql/functions_nl.go" beforeDir="false" afterPath="$PROJECT_DIR$/promql/functions_nl.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/promql/parser/functions.go" beforeDir="false" afterPath="$PROJECT_DIR$/promql/parser/functions.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -66,9 +64,9 @@
     <integration-enabled>true</integration-enabled>
   </component>
   <component name="WindowStateProjectService">
-    <state x="373" y="470" width="524" height="522" key="find.popup" timestamp="1608089083026">
+    <state x="826" y="467" width="533" height="522" key="find.popup" timestamp="1617094211976">
       <screen x="0" y="23" width="2560" height="1417" />
     </state>
-    <state x="373" y="470" width="524" height="522" key="find.popup/0.23.2560.1417@0.23.2560.1417" timestamp="1608089083026" />
+    <state x="826" y="467" width="533" height="522" key="find.popup/0.23.2560.1417@0.23.2560.1417" timestamp="1617094211976" />
   </component>
 </project>
