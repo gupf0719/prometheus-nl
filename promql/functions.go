@@ -186,7 +186,7 @@ func instantValue(vals []parser.Value, out Vector, isRate bool) Vector {
 		// Convert to per-second.
 		resultValue /= float64(sampledInterval) / 1000
 	}
-	if resultValue >100000{
+	if resultValue >1000{
 		fmt.Println("irate samples : ",samples.Points)
 		fmt.Println("irate previousSample : ",samples.Points[len(samples.Points)-2])
 		fmt.Println("irate lastSample : ",samples.Points[len(samples.Points)-1])
@@ -194,7 +194,7 @@ func instantValue(vals []parser.Value, out Vector, isRate bool) Vector {
 		if len(samples.Points) > 2 {
 			lastSample = samples.Points[len(samples.Points)-2]
 			previousSample = samples.Points[len(samples.Points)-3]
-
+			fmt.Println("irate fix : ", "previousSample ", previousSample, " lastSample",lastSample)
 			if isRate && lastSample.V < previousSample.V {
 				// Counter reset.
 				resultValue = lastSample.V
@@ -212,6 +212,7 @@ func instantValue(vals []parser.Value, out Vector, isRate bool) Vector {
 				// Convert to per-second.
 				resultValue /= float64(sampledInterval) / 1000
 			}
+			fmt.Println("irate fix result: ", resultValue)
 		}
 	}
 	return append(out, Sample{
