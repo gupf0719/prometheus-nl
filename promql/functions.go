@@ -215,6 +215,8 @@ func instantValue(vals []parser.Value, out Vector, isRate bool) Vector {
 			fmt.Println("irate fix result: ", resultValue)
 		}
 	}
+	fmt.Println("irate samples : ",samples.Points," previousSample: ",previousSample," lastSample: ",lastSample," resultValue: ",resultValue)
+	fmt.Println("irate out : ",out)
 	return append(out, Sample{
 		Point: Point{V: resultValue},
 	})
