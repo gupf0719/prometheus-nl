@@ -351,7 +351,7 @@ func main() {
 
 	logger := promlog.New(&cfg.promlogConfig)
 
-	//by pengsg
+	//by newland
 	common.SetLogger(logger)
 	common.Setlevel(*cfg.promlogConfig.Level)
 	// end

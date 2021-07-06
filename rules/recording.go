@@ -58,8 +58,8 @@ type RecordingRule struct {
 	// Duration of how long it took to evaluate the recording rule.
 	evaluationDuration time.Duration
 
-	//add by tengyt
-	Filters []string //add by pengsg
+	//add by newland
+	Filters []string
 }
 
 // NewRecordingRule returns a new recording rule.
@@ -69,7 +69,7 @@ func NewRecordingRule(name string, vector parser.Expr, lset labels.Labels, filte
 		vector: vector,
 		health: HealthUnknown,
 		labels: lset,
-		Filters: filters,  //add by tengyt
+		Filters: filters,  //add by newland
 	}
 }
 

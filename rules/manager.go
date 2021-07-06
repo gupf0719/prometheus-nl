@@ -963,7 +963,7 @@ func (m *Manager) Update(interval time.Duration, files []string, externalLabels 
 	m.restored = true
 
 
-	//add by pengsg from k8s cm
+	//add by newland from k8s cm
 	if m.rrs != nil { //开关开启才有这个功能
 		level.Info(m.logger).Log("msg", "loading groups from k8s configmap")
 		groups2, errs := m.LoadGroupsWithK8sConfigMap(interval)
@@ -1099,7 +1099,7 @@ func (m *Manager) LoadGroupsWithK8sConfigMap(interval time.Duration) (map[string
 				r.Record.Value,
 				expr,
 				labels.FromMap(r.Labels),
-				r.Filters, //add by pengsg
+				r.Filters, //add by newland
 			))
 		}
 		//rg.Name + ";" + ""
@@ -1165,7 +1165,7 @@ func (m *Manager) LoadGroups(
 					r.Record.Value,
 					expr,
 					labels.FromMap(r.Labels),
-					r.Filters, //add by pengsg
+					r.Filters, //add by newland
 				))
 			}
 
@@ -1234,7 +1234,7 @@ func (m *Manager) AlertingRules() []*AlertingRule {
 	return alerts
 }
 
-// add by tengyt
+// add by newland
 func (m *Manager) SetRecordRuleService(s *k8scm.RecordRuleService) {
 	m.rrs = s
 }
