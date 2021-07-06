@@ -46,6 +46,10 @@ type WrappedError struct {
 	nodeAlt *yaml.Node
 }
 
+func (w *WrappedError) Error() error{
+	return w.err
+}
+
 func (err *Error) Error() string {
 	if err.Err.nodeAlt != nil {
 		return errors.Wrapf(err.Err.err, "%d:%d: %d:%d: group %q, rule %d, %q", err.Err.node.Line, err.Err.node.Column, err.Err.nodeAlt.Line, err.Err.nodeAlt.Column, err.Group, err.Rule, err.RuleName).Error()
@@ -128,6 +132,9 @@ type RuleNode struct {
 	For         model.Duration    `yaml:"for,omitempty"`
 	Labels      map[string]string `yaml:"labels,omitempty"`
 	Annotations map[string]string `yaml:"annotations,omitempty"`
+
+	//add by newland
+	Filters []string `yaml:"filters,omitempty"`
 }
 
 // Validate the rule and return a list of encountered errors.

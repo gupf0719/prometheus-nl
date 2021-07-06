@@ -158,12 +158,12 @@
             alert: 'PrometheusRemoteStorageFailures',
             expr: |||
               (
-                rate(prometheus_remote_storage_failed_samples_total{%(prometheusSelector)s}[5m])
+                (rate(prometheus_remote_storage_failed_samples_total{%(prometheusSelector)s}[5m]) or rate(prometheus_remote_storage_samples_failed_total{%(prometheusSelector)s}[5m]))
               /
                 (
-                  rate(prometheus_remote_storage_failed_samples_total{%(prometheusSelector)s}[5m])
+                  (rate(prometheus_remote_storage_failed_samples_total{%(prometheusSelector)s}[5m]) or rate(prometheus_remote_storage_samples_failed_total{%(prometheusSelector)s}[5m]))
                 +
-                  rate(prometheus_remote_storage_succeeded_samples_total{%(prometheusSelector)s}[5m])
+                  (rate(prometheus_remote_storage_succeeded_samples_total{%(prometheusSelector)s}[5m]) or rate(prometheus_remote_storage_samples_total{%(prometheusSelector)s}[5m]))
                 )
               )
               * 100
@@ -259,6 +259,20 @@
             annotations: {
               summary: 'Prometheus has dropped targets because some scrape configs have exceeded the targets limit.',
               description: 'Prometheus %(prometheusName)s has dropped {{ printf "%%.0f" $value }} targets because the number of targets exceeded the configured target_limit.' % $._config,
+            },
+          },
+          {
+            alert: 'PrometheusLabelLimitHit',
+            expr: |||
+              increase(prometheus_target_scrape_pool_exceeded_label_limits_total{%(prometheusSelector)s}[5m]) > 0
+            ||| % $._config,
+            'for': '15m',
+            labels: {
+              severity: 'warning',
+            },
+            annotations: {
+              summary: 'Prometheus has dropped targets because some scrape configs have exceeded the labels limit.',
+              description: 'Prometheus %(prometheusName)s has dropped {{ printf "%%.0f" $value }} targets because some samples exceeded the configured label_limit, label_name_length_limit or label_value_length_limit.' % $._config,
             },
           },
         ] + if $._config.prometheusHAGroupLabels == '' then self.rulesWithoutHA else self.rulesWithHA,

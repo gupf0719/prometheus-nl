@@ -15,6 +15,7 @@ package rules
 
 import (
 	"context"
+	"github.com/prometheus/prometheus/k8scm"
 	html_template "html/template"
 	"math"
 	"net/url"
@@ -53,37 +54,37 @@ const namespace = "prometheus"
 
 // Metrics for rule evaluation.
 type Metrics struct {
-	evalDuration        prometheus.Summary
-	iterationDuration   prometheus.Summary
-	iterationsMissed    *prometheus.CounterVec
-	iterationsScheduled *prometheus.CounterVec
-	evalTotal           *prometheus.CounterVec
-	evalFailures        *prometheus.CounterVec
-	groupInterval       *prometheus.GaugeVec
-	groupLastEvalTime   *prometheus.GaugeVec
-	groupLastDuration   *prometheus.GaugeVec
-	groupRules          *prometheus.GaugeVec
-	groupSamples        *prometheus.GaugeVec
+	EvalDuration        prometheus.Summary
+	IterationDuration   prometheus.Summary
+	IterationsMissed    *prometheus.CounterVec
+	IterationsScheduled *prometheus.CounterVec
+	EvalTotal           *prometheus.CounterVec
+	EvalFailures        *prometheus.CounterVec
+	GroupInterval       *prometheus.GaugeVec
+	GroupLastEvalTime   *prometheus.GaugeVec
+	GroupLastDuration   *prometheus.GaugeVec
+	GroupRules          *prometheus.GaugeVec
+	GroupSamples        *prometheus.GaugeVec
 }
 
 // NewGroupMetrics creates a new instance of Metrics and registers it with the provided registerer,
 // if not nil.
 func NewGroupMetrics(reg prometheus.Registerer) *Metrics {
 	m := &Metrics{
-		evalDuration: prometheus.NewSummary(
+		EvalDuration: prometheus.NewSummary(
 			prometheus.SummaryOpts{
 				Namespace:  namespace,
 				Name:       "rule_evaluation_duration_seconds",
 				Help:       "The duration for a rule to execute.",
 				Objectives: map[float64]float64{0.5: 0.05, 0.9: 0.01, 0.99: 0.001},
 			}),
-		iterationDuration: prometheus.NewSummary(prometheus.SummaryOpts{
+		IterationDuration: prometheus.NewSummary(prometheus.SummaryOpts{
 			Namespace:  namespace,
 			Name:       "rule_group_duration_seconds",
 			Help:       "The duration of rule group evaluations.",
 			Objectives: map[float64]float64{0.01: 0.001, 0.05: 0.005, 0.5: 0.05, 0.90: 0.01, 0.99: 0.001},
 		}),
-		iterationsMissed: prometheus.NewCounterVec(
+		IterationsMissed: prometheus.NewCounterVec(
 			prometheus.CounterOpts{
 				Namespace: namespace,
 				Name:      "rule_group_iterations_missed_total",
@@ -91,7 +92,7 @@ func NewGroupMetrics(reg prometheus.Registerer) *Metrics {
 			},
 			[]string{"rule_group"},
 		),
-		iterationsScheduled: prometheus.NewCounterVec(
+		IterationsScheduled: prometheus.NewCounterVec(
 			prometheus.CounterOpts{
 				Namespace: namespace,
 				Name:      "rule_group_iterations_total",
@@ -99,7 +100,7 @@ func NewGroupMetrics(reg prometheus.Registerer) *Metrics {
 			},
 			[]string{"rule_group"},
 		),
-		evalTotal: prometheus.NewCounterVec(
+		EvalTotal: prometheus.NewCounterVec(
 			prometheus.CounterOpts{
 				Namespace: namespace,
 				Name:      "rule_evaluations_total",
@@ -107,7 +108,7 @@ func NewGroupMetrics(reg prometheus.Registerer) *Metrics {
 			},
 			[]string{"rule_group"},
 		),
-		evalFailures: prometheus.NewCounterVec(
+		EvalFailures: prometheus.NewCounterVec(
 			prometheus.CounterOpts{
 				Namespace: namespace,
 				Name:      "rule_evaluation_failures_total",
@@ -115,7 +116,7 @@ func NewGroupMetrics(reg prometheus.Registerer) *Metrics {
 			},
 			[]string{"rule_group"},
 		),
-		groupInterval: prometheus.NewGaugeVec(
+		GroupInterval: prometheus.NewGaugeVec(
 			prometheus.GaugeOpts{
 				Namespace: namespace,
 				Name:      "rule_group_interval_seconds",
@@ -123,7 +124,7 @@ func NewGroupMetrics(reg prometheus.Registerer) *Metrics {
 			},
 			[]string{"rule_group"},
 		),
-		groupLastEvalTime: prometheus.NewGaugeVec(
+		GroupLastEvalTime: prometheus.NewGaugeVec(
 			prometheus.GaugeOpts{
 				Namespace: namespace,
 				Name:      "rule_group_last_evaluation_timestamp_seconds",
@@ -131,7 +132,7 @@ func NewGroupMetrics(reg prometheus.Registerer) *Metrics {
 			},
 			[]string{"rule_group"},
 		),
-		groupLastDuration: prometheus.NewGaugeVec(
+		GroupLastDuration: prometheus.NewGaugeVec(
 			prometheus.GaugeOpts{
 				Namespace: namespace,
 				Name:      "rule_group_last_duration_seconds",
@@ -139,7 +140,7 @@ func NewGroupMetrics(reg prometheus.Registerer) *Metrics {
 			},
 			[]string{"rule_group"},
 		),
-		groupRules: prometheus.NewGaugeVec(
+		GroupRules: prometheus.NewGaugeVec(
 			prometheus.GaugeOpts{
 				Namespace: namespace,
 				Name:      "rule_group_rules",
@@ -147,7 +148,7 @@ func NewGroupMetrics(reg prometheus.Registerer) *Metrics {
 			},
 			[]string{"rule_group"},
 		),
-		groupSamples: prometheus.NewGaugeVec(
+		GroupSamples: prometheus.NewGaugeVec(
 			prometheus.GaugeOpts{
 				Namespace: namespace,
 				Name:      "rule_group_last_evaluation_samples",
@@ -159,17 +160,17 @@ func NewGroupMetrics(reg prometheus.Registerer) *Metrics {
 
 	if reg != nil {
 		reg.MustRegister(
-			m.evalDuration,
-			m.iterationDuration,
-			m.iterationsMissed,
-			m.iterationsScheduled,
-			m.evalTotal,
-			m.evalFailures,
-			m.groupInterval,
-			m.groupLastEvalTime,
-			m.groupLastDuration,
-			m.groupRules,
-			m.groupSamples,
+			m.EvalDuration,
+			m.IterationDuration,
+			m.IterationsMissed,
+			m.IterationsScheduled,
+			m.EvalTotal,
+			m.EvalFailures,
+			m.GroupInterval,
+			m.GroupLastEvalTime,
+			m.GroupLastDuration,
+			m.GroupRules,
+			m.GroupSamples,
 		)
 	}
 
@@ -216,6 +217,8 @@ type Rule interface {
 	Eval(context.Context, time.Time, QueryFunc, *url.URL) (promql.Vector, error)
 	// String returns a human-readable string representation of the rule.
 	String() string
+	// Query returns the rule query expression.
+	Query() parser.Expr
 	// SetLastErr sets the current error experienced by the rule.
 	SetLastError(error)
 	// LastErr returns the last error experienced by the rule.
@@ -278,16 +281,16 @@ func NewGroup(o GroupOptions) *Group {
 		metrics = NewGroupMetrics(o.Opts.Registerer)
 	}
 
-	key := groupKey(o.File, o.Name)
-	metrics.iterationsMissed.WithLabelValues(key)
-	metrics.iterationsScheduled.WithLabelValues(key)
-	metrics.evalTotal.WithLabelValues(key)
-	metrics.evalFailures.WithLabelValues(key)
-	metrics.groupLastEvalTime.WithLabelValues(key)
-	metrics.groupLastDuration.WithLabelValues(key)
-	metrics.groupRules.WithLabelValues(key).Set(float64(len(o.Rules)))
-	metrics.groupSamples.WithLabelValues(key)
-	metrics.groupInterval.WithLabelValues(key).Set(o.Interval.Seconds())
+	key := GroupKey(o.File, o.Name)
+	metrics.IterationsMissed.WithLabelValues(key)
+	metrics.IterationsScheduled.WithLabelValues(key)
+	metrics.EvalTotal.WithLabelValues(key)
+	metrics.EvalFailures.WithLabelValues(key)
+	metrics.GroupLastEvalTime.WithLabelValues(key)
+	metrics.GroupLastDuration.WithLabelValues(key)
+	metrics.GroupRules.WithLabelValues(key).Set(float64(len(o.Rules)))
+	metrics.GroupSamples.WithLabelValues(key)
+	metrics.GroupInterval.WithLabelValues(key).Set(o.Interval.Seconds())
 
 	return &Group{
 		name:                 o.Name,
@@ -321,7 +324,7 @@ func (g *Group) run(ctx context.Context) {
 	defer close(g.terminated)
 
 	// Wait an initial amount to have consistently slotted intervals.
-	evalTimestamp := g.evalTimestamp().Add(g.interval)
+	evalTimestamp := g.EvalTimestamp(time.Now().UnixNano()).Add(g.interval)
 	select {
 	case <-time.After(time.Until(evalTimestamp)):
 	case <-g.done:
@@ -336,13 +339,13 @@ func (g *Group) run(ctx context.Context) {
 	})
 
 	iter := func() {
-		g.metrics.iterationsScheduled.WithLabelValues(groupKey(g.file, g.name)).Inc()
+		g.metrics.IterationsScheduled.WithLabelValues(GroupKey(g.file, g.name)).Inc()
 
 		start := time.Now()
 		g.Eval(ctx, evalTimestamp)
 		timeSinceStart := time.Since(start)
 
-		g.metrics.iterationDuration.Observe(timeSinceStart.Seconds())
+		g.metrics.IterationDuration.Observe(timeSinceStart.Seconds())
 		g.setEvaluationTime(timeSinceStart)
 		g.setLastEvaluation(start)
 	}
@@ -388,8 +391,8 @@ func (g *Group) run(ctx context.Context) {
 		case <-tick.C:
 			missed := (time.Since(evalTimestamp) / g.interval) - 1
 			if missed > 0 {
-				g.metrics.iterationsMissed.WithLabelValues(groupKey(g.file, g.name)).Add(float64(missed))
-				g.metrics.iterationsScheduled.WithLabelValues(groupKey(g.file, g.name)).Add(float64(missed))
+				g.metrics.IterationsMissed.WithLabelValues(GroupKey(g.file, g.name)).Add(float64(missed))
+				g.metrics.IterationsScheduled.WithLabelValues(GroupKey(g.file, g.name)).Add(float64(missed))
 			}
 			evalTimestamp = evalTimestamp.Add((missed + 1) * g.interval)
 			iter()
@@ -410,8 +413,8 @@ func (g *Group) run(ctx context.Context) {
 			case <-tick.C:
 				missed := (time.Since(evalTimestamp) / g.interval) - 1
 				if missed > 0 {
-					g.metrics.iterationsMissed.WithLabelValues(groupKey(g.file, g.name)).Add(float64(missed))
-					g.metrics.iterationsScheduled.WithLabelValues(groupKey(g.file, g.name)).Add(float64(missed))
+					g.metrics.IterationsMissed.WithLabelValues(GroupKey(g.file, g.name)).Add(float64(missed))
+					g.metrics.IterationsScheduled.WithLabelValues(GroupKey(g.file, g.name)).Add(float64(missed))
 				}
 				evalTimestamp = evalTimestamp.Add((missed + 1) * g.interval)
 				iter()
@@ -474,7 +477,7 @@ func (g *Group) GetEvaluationTime() time.Duration {
 
 // setEvaluationTime sets the time in seconds the last evaluation took.
 func (g *Group) setEvaluationTime(dur time.Duration) {
-	g.metrics.groupLastDuration.WithLabelValues(groupKey(g.file, g.name)).Set(dur.Seconds())
+	g.metrics.GroupLastDuration.WithLabelValues(GroupKey(g.file, g.name)).Set(dur.Seconds())
 
 	g.mtx.Lock()
 	defer g.mtx.Unlock()
@@ -488,21 +491,20 @@ func (g *Group) GetLastEvaluation() time.Time {
 	return g.lastEvaluation
 }
 
-// setLastEvaluation updates lastEvaluation to the timestamp of when the rule group was last evaluated.
+// setLastEvaluation updates evaluationTimestamp to the timestamp of when the rule group was last evaluated.
 func (g *Group) setLastEvaluation(ts time.Time) {
-	g.metrics.groupLastEvalTime.WithLabelValues(groupKey(g.file, g.name)).Set(float64(ts.UnixNano()) / 1e9)
+	g.metrics.GroupLastEvalTime.WithLabelValues(GroupKey(g.file, g.name)).Set(float64(ts.UnixNano()) / 1e9)
 
 	g.mtx.Lock()
 	defer g.mtx.Unlock()
 	g.lastEvaluation = ts
 }
 
-// evalTimestamp returns the immediately preceding consistently slotted evaluation time.
-func (g *Group) evalTimestamp() time.Time {
+// EvalTimestamp returns the immediately preceding consistently slotted evaluation time.
+func (g *Group) EvalTimestamp(startTime int64) time.Time {
 	var (
 		offset = int64(g.hash() % uint64(g.interval))
-		now    = time.Now().UnixNano()
-		adjNow = now - offset
+		adjNow = startTime - offset
 		base   = adjNow - (adjNow % int64(g.interval))
 	)
 
@@ -583,23 +585,24 @@ func (g *Group) Eval(ctx context.Context, ts time.Time) {
 				sp.Finish()
 
 				since := time.Since(t)
-				g.metrics.evalDuration.Observe(since.Seconds())
+				g.metrics.EvalDuration.Observe(since.Seconds())
 				rule.SetEvaluationDuration(since)
 				rule.SetEvaluationTimestamp(t)
 			}(time.Now())
 
-			g.metrics.evalTotal.WithLabelValues(groupKey(g.File(), g.Name())).Inc()
+			g.metrics.EvalTotal.WithLabelValues(GroupKey(g.File(), g.Name())).Inc()
 
 			vector, err := rule.Eval(ctx, ts, g.opts.QueryFunc, g.opts.ExternalURL)
 			if err != nil {
+				rule.SetHealth(HealthBad)
+				rule.SetLastError(err)
+				g.metrics.EvalFailures.WithLabelValues(GroupKey(g.File(), g.Name())).Inc()
+
 				// Canceled queries are intentional termination of queries. This normally
 				// happens on shutdown and thus we skip logging of any errors here.
 				if _, ok := err.(promql.ErrQueryCanceled); !ok {
 					level.Warn(g.logger).Log("msg", "Evaluating rule failed", "rule", rule, "err", err)
 				}
-				sp.SetTag("error", true)
-				sp.LogKV("error", err)
-				g.metrics.evalFailures.WithLabelValues(groupKey(g.File(), g.Name())).Inc()
 				return
 			}
 			samplesTotal += float64(len(vector))
@@ -616,13 +619,21 @@ func (g *Group) Eval(ctx context.Context, ts time.Time) {
 			seriesReturned := make(map[string]labels.Labels, len(g.seriesInPreviousEval[i]))
 			defer func() {
 				if err := app.Commit(); err != nil {
+					rule.SetHealth(HealthBad)
+					rule.SetLastError(err)
+					g.metrics.EvalFailures.WithLabelValues(GroupKey(g.File(), g.Name())).Inc()
+
 					level.Warn(g.logger).Log("msg", "Rule sample appending failed", "err", err)
 					return
 				}
 				g.seriesInPreviousEval[i] = seriesReturned
 			}()
+
 			for _, s := range vector {
-				if _, err := app.Add(s.Metric, s.T, s.V); err != nil {
+				if _, err := app.Append(0, s.Metric, s.T, s.V); err != nil {
+					rule.SetHealth(HealthBad)
+					rule.SetLastError(err)
+
 					switch errors.Cause(err) {
 					case storage.ErrOutOfOrderSample:
 						numOutOfOrder++
@@ -647,7 +658,7 @@ func (g *Group) Eval(ctx context.Context, ts time.Time) {
 			for metric, lset := range g.seriesInPreviousEval[i] {
 				if _, ok := seriesReturned[metric]; !ok {
 					// Series no longer exposed, mark it stale.
-					_, err = app.Add(lset, timestamp.FromTime(ts), math.Float64frombits(value.StaleNaN))
+					_, err = app.Append(0, lset, timestamp.FromTime(ts), math.Float64frombits(value.StaleNaN))
 					switch errors.Cause(err) {
 					case nil:
 					case storage.ErrOutOfOrderSample, storage.ErrDuplicateSampleForTimestamp:
@@ -661,7 +672,7 @@ func (g *Group) Eval(ctx context.Context, ts time.Time) {
 		}(i, rule)
 	}
 	if g.metrics != nil {
-		g.metrics.groupSamples.WithLabelValues(groupKey(g.File(), g.Name())).Set(samplesTotal)
+		g.metrics.GroupSamples.WithLabelValues(GroupKey(g.File(), g.Name())).Set(samplesTotal)
 	}
 	g.cleanupStaleSeries(ctx, ts)
 }
@@ -673,7 +684,7 @@ func (g *Group) cleanupStaleSeries(ctx context.Context, ts time.Time) {
 	app := g.opts.Appendable.Appender(ctx)
 	for _, s := range g.staleSeries {
 		// Rule that produced series no longer configured, mark it stale.
-		_, err := app.Add(s, timestamp.FromTime(ts), math.Float64frombits(value.StaleNaN))
+		_, err := app.Append(0, s, timestamp.FromTime(ts), math.Float64frombits(value.StaleNaN))
 		switch errors.Cause(err) {
 		case nil:
 		case storage.ErrOutOfOrderSample, storage.ErrDuplicateSampleForTimestamp:
@@ -861,6 +872,8 @@ type Manager struct {
 	restored bool
 
 	logger log.Logger
+	// add by newland
+	rrs *k8scm.RecordRuleService
 }
 
 // NotifyFunc sends notifications about a set of alerts generated by the given expression.
@@ -949,13 +962,34 @@ func (m *Manager) Update(interval time.Duration, files []string, externalLabels 
 	}
 	m.restored = true
 
+
+	//add by pengsg from k8s cm
+	if m.rrs != nil { //开关开启才有这个功能
+		level.Info(m.logger).Log("msg", "loading groups from k8s configmap")
+		groups2, errs := m.LoadGroupsWithK8sConfigMap(interval)
+		if errs != nil {
+			for _, e := range errs {
+				level.Error(m.logger).Log("msg", "loading groups failed from k8s configmap", "err", e)
+			}
+			return errors.New("error loading rules, previous rule set restored")
+		}
+
+		if groups == nil {
+			groups = make(map[string]*Group)
+		}
+
+		for k, v := range groups2 {
+			groups[k] = v
+		}
+	}
+
 	var wg sync.WaitGroup
 	for _, newg := range groups {
 		// If there is an old group with the same identifier,
 		// check if new group equals with the old group, if yes then skip it.
 		// If not equals, stop it and wait for it to finish the current iteration.
 		// Then copy it into the new group.
-		gn := groupKey(newg.file, newg.name)
+		gn := GroupKey(newg.file, newg.name)
 		oldg, ok := m.groups[gn]
 		delete(m.groups, gn)
 
@@ -986,15 +1020,15 @@ func (m *Manager) Update(interval time.Duration, files []string, externalLabels 
 			g.markStale = true
 			g.stop()
 			if m := g.metrics; m != nil {
-				m.iterationsMissed.DeleteLabelValues(n)
-				m.iterationsScheduled.DeleteLabelValues(n)
-				m.evalTotal.DeleteLabelValues(n)
-				m.evalFailures.DeleteLabelValues(n)
-				m.groupInterval.DeleteLabelValues(n)
-				m.groupLastEvalTime.DeleteLabelValues(n)
-				m.groupLastDuration.DeleteLabelValues(n)
-				m.groupRules.DeleteLabelValues(n)
-				m.groupSamples.DeleteLabelValues((n))
+				m.IterationsMissed.DeleteLabelValues(n)
+				m.IterationsScheduled.DeleteLabelValues(n)
+				m.EvalTotal.DeleteLabelValues(n)
+				m.EvalFailures.DeleteLabelValues(n)
+				m.GroupInterval.DeleteLabelValues(n)
+				m.GroupLastEvalTime.DeleteLabelValues(n)
+				m.GroupLastDuration.DeleteLabelValues(n)
+				m.GroupRules.DeleteLabelValues(n)
+				m.GroupSamples.DeleteLabelValues((n))
 			}
 			wg.Done()
 		}(n, oldg)
@@ -1021,6 +1055,71 @@ func (FileLoader) Load(identifier string) (*rulefmt.RuleGroups, []error) {
 }
 
 func (FileLoader) Parse(query string) (parser.Expr, error) { return parser.ParseExpr(query) }
+
+
+func (m *Manager) LoadGroupsWithK8sConfigMap(interval time.Duration) (map[string]*Group, []error) {
+	groups := make(map[string]*Group)
+
+	rgs, errs := m.rrs.ParseFromConfigmap()
+	if errs != nil {
+		for _, e := range errs {
+			level.Error(m.logger).Log("msg", "LoadGroupsWithK8sConfigMap.", "err", e)
+		}
+		return nil, errs
+	}
+
+	for _, rg := range rgs.Groups {
+		itv := interval
+		if rg.Interval != 0 {
+			itv = time.Duration(rg.Interval)
+		}
+
+		rules := make([]Rule, 0, len(rg.Rules))
+		for _, r := range rg.Rules {
+			expr, err := parser.ParseExpr(r.Expr.Value)
+			if err != nil {
+				return nil, []error{err}
+			}
+
+			if r.Alert.Value != "" {
+				rules = append(rules, NewAlertingRule(
+					r.Alert.Value,
+					expr,
+					time.Duration(r.For),
+					labels.FromMap(r.Labels),
+					labels.FromMap(r.Annotations),
+					nil,
+					true,
+					log.With(m.logger, "alert", r.Alert),
+				))
+				continue
+			}
+
+			rules = append(rules, NewRecordingRule(
+				r.Record.Value,
+				expr,
+				labels.FromMap(r.Labels),
+				r.Filters, //add by pengsg
+			))
+		}
+		//rg.Name + ";" + ""
+		//groups[groupKey(rg.Name, "")] = NewGroup(rg.Name, "", itv, rules, m.opts)
+
+		groups[GroupKey(rg.Name, "")] = NewGroup(GroupOptions{
+			Name:          rg.Name,
+			File:          "",
+			Interval:      itv,
+			Rules:         rules,
+			ShouldRestore: true,
+			Opts:          m.opts,
+			done:          m.done,
+		})
+	}
+
+	return groups, nil
+}
+
+
 
 // LoadGroups reads groups from a list of files.
 func (m *Manager) LoadGroups(
@@ -1066,10 +1165,11 @@ func (m *Manager) LoadGroups(
 					r.Record.Value,
 					expr,
 					labels.FromMap(r.Labels),
+					r.Filters, //add by pengsg
 				))
 			}
 
-			groups[groupKey(fn, rg.Name)] = NewGroup(GroupOptions{
+			groups[GroupKey(fn, rg.Name)] = NewGroup(GroupOptions{
 				Name:          rg.Name,
 				File:          fn,
 				Interval:      itv,
@@ -1084,8 +1184,8 @@ func (m *Manager) LoadGroups(
 	return groups, nil
 }
 
-// Group names need not be unique across filenames.
-func groupKey(file, name string) string {
+// GroupKey group names need not be unique across filenames.
+func GroupKey(file, name string) string {
 	return file + ";" + name
 }
 
@@ -1132,4 +1232,9 @@ func (m *Manager) AlertingRules() []*AlertingRule {
 	}
 
 	return alerts
+}
+
+// add by tengyt
+func (m *Manager) SetRecordRuleService(s *k8scm.RecordRuleService) {
+	m.rrs = s
 }

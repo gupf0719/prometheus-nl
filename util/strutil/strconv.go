@@ -14,9 +14,13 @@
 package strutil
 
 import (
+	"encoding/base64"
 	"fmt"
+	"hash/crc32"
 	"net/url"
+	"os"
 	"regexp"
+	"strconv"
 	"strings"
 )
 
@@ -44,7 +48,8 @@ func SanitizeLabelName(name string) string {
 	return invalidLabelCharRE.ReplaceAllString(name, "_")
 }
 
-// newland
+
+//add bynewland
 func SplitString(s string, split string) (s1 string, s2 string) {
 	ss := strings.Split(s, split)
 	s1 = strings.TrimSpace(ss[0])
@@ -58,4 +63,67 @@ func SplitString(s string, split string) (s1 string, s2 string) {
 		s2 = s1
 	}
 	return
+}
+//add bynewland
+func BinarySearch(strs []string, s string) int {
+	lo, hi := 0, len(strs)-1
+	for lo <= hi {
+		m := (lo + hi) >> 1
+		if strs[m] < s {
+			lo = m + 1
+		} else if strs[m] > s {
+			hi = m - 1
+		} else {
+			return m
+		}
+	}
+	return -1
+}
+//add bynewland
+func DecodeByBase64(labelValue string) (string, error) {
+	lbvalue := strings.TrimPrefix(labelValue, "b64")
+	lbvalue = strings.TrimSuffix(lbvalue, "0")
+	lbvalue = strings.Replace(lbvalue, "-", "+", -1)
+	lbvalue = strings.Replace(lbvalue, "_", "/", -1)
+	lbvalue = strings.Replace(lbvalue, ".", "=", -1)
+	lbvalue = strings.Replace(lbvalue, " ", "+", -1)
+	rs, err := base64.StdEncoding.DecodeString(lbvalue)
+	if err != nil {
+		return "", err
+	}
+	return string(rs), nil
+}
+//add bynewland
+func GetSplits(s string, n int) int {
+	v := int(crc32.ChecksumIEEE([]byte(s)))
+	if -v >= 0 {
+		v = -v
+	}
+
+	return v % n
+}
+//add bynewland
+func GetHashValue(s string) string {
+	v := int(crc32.ChecksumIEEE([]byte(s)))
+	if -v >= 0 {
+		v = -v
+	}
+
+	return "r"+strconv.Itoa(v)
+}
+//add bynewland
+func ReplaceVars(s string) string {
+	p := regexp.MustCompile(`\$\w+`)
+	rs := p.FindAllString(s, -1)
+	for _, s0 := range rs {
+		s = strings.Replace(s, s0, os.Getenv(strings.TrimPrefix(s0, "$")), -1)
+	}
+
+	p = regexp.MustCompile(`\${\w+}`)
+	rs = p.FindAllString(s, -1)
+	for _, s0 := range rs {
+		s = strings.Replace(s, s0, os.Getenv(strings.TrimSuffix(strings.TrimPrefix(s0, "${"), "}")), -1)
+	}
+
+	return s
 }

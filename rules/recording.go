@@ -30,6 +30,18 @@ import (
 	"github.com/prometheus/prometheus/util/strutil"
 )
 
+
+//add by newland
+type RuleFilter interface {
+	RuleFilter(lb *labels.Builder, ctx context.Context, ts time.Time, query QueryFunc) bool
+}
+
+var ruleFilters = make(map[string]RuleFilter)
+
+func RegistryRuleFilter(fn string, r RuleFilter) {
+	ruleFilters[fn] = r
+}
+
 // A RecordingRule records its vector expression into new timeseries.
 type RecordingRule struct {
 	name   string
@@ -45,15 +57,19 @@ type RecordingRule struct {
 	lastError error
 	// Duration of how long it took to evaluate the recording rule.
 	evaluationDuration time.Duration
+
+	//add by tengyt
+	Filters []string //add by pengsg
 }
 
 // NewRecordingRule returns a new recording rule.
-func NewRecordingRule(name string, vector parser.Expr, lset labels.Labels) *RecordingRule {
+func NewRecordingRule(name string, vector parser.Expr, lset labels.Labels, filters []string) *RecordingRule {
 	return &RecordingRule{
 		name:   name,
 		vector: vector,
 		health: HealthUnknown,
 		labels: lset,
+		Filters: filters,  //add by tengyt
 	}
 }
 
@@ -76,11 +92,9 @@ func (rule *RecordingRule) Labels() labels.Labels {
 func (rule *RecordingRule) Eval(ctx context.Context, ts time.Time, query QueryFunc, _ *url.URL) (promql.Vector, error) {
 	vector, err := query(ctx, rule.vector.String(), ts)
 	if err != nil {
-		rule.SetHealth(HealthBad)
-		rule.SetLastError(err)
 		return nil, err
 	}
-	// Override the metric name and labels.
+/*	// Override the metric name and labels.
 	for i := range vector {
 		sample := &vector[i]
 
@@ -93,11 +107,34 @@ func (rule *RecordingRule) Eval(ctx context.Context, ts time.Time, query QueryFu
 		}
 
 		sample.Metric = lb.Labels()
+	}*/
+
+	newVector := make(promql.Vector, 0, len(vector))
+	// Override the metric name and labels.
+out:
+	for i := range vector {
+		sample := vector[i] //每一个样本实际上就是由一些label组成，包括name,name表示为__name__
+		lb := labels.NewBuilder(sample.Metric)
+
+		lb.Set(labels.MetricName, rule.name)
+
+		for _, fn := range rule.Filters {
+			if filterResult := ruleFilters[fn].RuleFilter(lb, ctx, ts, query); !filterResult {
+				continue out
+			}
+		}
+
+		for _, l := range rule.labels {
+			lb.Set(l.Name, l.Value)
+		}
+
+		sample.Metric = lb.Labels()
+		newVector = append(newVector, sample)
 	}
 
 	// Check that the rule does not produce identical metrics after applying
 	// labels.
-	if vector.ContainsSameLabelset() {
+	if newVector.ContainsSameLabelset() {
 		err = fmt.Errorf("vector contains metrics with the same labelset after applying rule labels")
 		rule.SetHealth(HealthBad)
 		rule.SetLastError(err)
@@ -106,7 +143,7 @@ func (rule *RecordingRule) Eval(ctx context.Context, ts time.Time, query QueryFu
 
 	rule.SetHealth(HealthGood)
 	rule.SetLastError(err)
-	return vector, nil
+	return newVector, nil
 }
 
 func (rule *RecordingRule) String() string {

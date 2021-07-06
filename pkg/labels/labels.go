@@ -30,6 +30,10 @@ const (
 	InstanceName = "instance"
 
 	labelSep = '\xfe'
+
+	//add by newland
+	MetricScrapeTagKey   = "mtype"
+	MetricScrapeTagValue = "sys"
 )
 
 var seps = []byte{'\xff'}
@@ -473,7 +477,7 @@ Outer:
 	return res
 }
 
-// newland
+//add by newland
 func (ls Labels) BinarySearch(name string) (string,int) {
 	lo, hi := 0, len(ls)-1
 	for lo <= hi {
@@ -490,7 +494,7 @@ func (ls Labels) BinarySearch(name string) (string,int) {
 	return "", -1
 }
 
-// newland
+//add by newland, Index() returns the index if the label with the given name is present.
 func (ls Labels) Index(name string) int {
 	for i, l := range ls {
 		if l.Name == name {

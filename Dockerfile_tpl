@@ -1,0 +1,31 @@
+##FROM        quay.io/prometheus/busybox:latest
+#FROM        $registryServer/newland/busybox:nl
+FROM        $registryServer/paas_public/bclinux:7.6.1905
+LABEL maintainer "The Prometheus Authors <prometheus-developers@googlegroups.com>"
+RUN groupadd paasopt
+RUN useradd -d /openplat -g paasopt -m paasopt -u 2000
+
+COPY prometheus                             /bin/prometheus
+#COPY promecli/prome-cli                     /bin/prome-cli
+#COPY promtool                               /bin/promtool
+COPY documentation/examples/prometheus.yml  /etc/prometheus/prometheus.yml
+COPY documentation/examples/event_capture.yml  /etc/prometheus/event_capture.yml
+COPY console_libraries/                     /usr/share/prometheus/console_libraries/
+COPY consoles/                              /usr/share/prometheus/consoles/
+COPY web/                                   /usr/share/prometheus/web/
+
+RUN mkdir -p /prometheus && \
+    ln -s /usr/share/prometheus/console_libraries /usr/share/prometheus/consoles/ /usr/share/prometheus/web/ /prometheus && \
+    chown -R paasopt:paasopt etc/prometheus /prometheus &&\
+    chown -R paasopt:paasopt /bin/prometheus
+
+
+USER       paasopt
+EXPOSE     9090
+VOLUME     [ "/prometheus" ]
+WORKDIR    /prometheus
+ENTRYPOINT [ "/bin/prometheus" ]
+CMD        [ "--config.file=/etc/prometheus/prometheus.yml", \
+             "--storage.tsdb.path=/prometheus", \
+             "--web.console.libraries=/usr/share/prometheus/console_libraries", \
+             "--web.console.templates=/usr/share/prometheus/consoles" ]

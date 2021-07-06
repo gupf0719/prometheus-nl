@@ -76,11 +76,12 @@ type Compactor interface {
 
 // LeveledCompactor implements the Compactor interface.
 type LeveledCompactor struct {
-	metrics   *compactorMetrics
-	logger    log.Logger
-	ranges    []int64
-	chunkPool chunkenc.Pool
-	ctx       context.Context
+	metrics                  *compactorMetrics
+	logger                   log.Logger
+	ranges                   []int64
+	chunkPool                chunkenc.Pool
+	ctx                      context.Context
+	maxBlockChunkSegmentSize int64
 }
 
 type compactorMetrics struct {
@@ -111,7 +112,7 @@ func newCompactorMetrics(r prometheus.Registerer) *compactorMetrics {
 	m.duration = prometheus.NewHistogram(prometheus.HistogramOpts{
 		Name:    "prometheus_tsdb_compaction_duration_seconds",
 		Help:    "Duration of compaction runs",
-		Buckets: prometheus.ExponentialBuckets(1, 2, 10),
+		Buckets: prometheus.ExponentialBuckets(1, 2, 14),
 	})
 	m.chunkSize = prometheus.NewHistogram(prometheus.HistogramOpts{
 		Name:    "prometheus_tsdb_compaction_chunk_size_bytes",
@@ -145,6 +146,10 @@ func newCompactorMetrics(r prometheus.Registerer) *compactorMetrics {
 
 // NewLeveledCompactor returns a LeveledCompactor.
 func NewLeveledCompactor(ctx context.Context, r prometheus.Registerer, l log.Logger, ranges []int64, pool chunkenc.Pool) (*LeveledCompactor, error) {
+	return NewLeveledCompactorWithChunkSize(ctx, r, l, ranges, pool, chunks.DefaultChunkSegmentSize)
+}
+
+func NewLeveledCompactorWithChunkSize(ctx context.Context, r prometheus.Registerer, l log.Logger, ranges []int64, pool chunkenc.Pool, maxBlockChunkSegmentSize int64) (*LeveledCompactor, error) {
 	if len(ranges) == 0 {
 		return nil, errors.Errorf("at least one range must be provided")
 	}
@@ -155,11 +160,12 @@ func NewLeveledCompactor(ctx context.Context, r prometheus.Registerer, l log.Log
 		l = log.NewNopLogger()
 	}
 	return &LeveledCompactor{
-		ranges:    ranges,
-		chunkPool: pool,
-		logger:    l,
-		metrics:   newCompactorMetrics(r),
-		ctx:       ctx,
+		ranges:                   ranges,
+		chunkPool:                pool,
+		logger:                   l,
+		metrics:                  newCompactorMetrics(r),
+		ctx:                      ctx,
+		maxBlockChunkSegmentSize: maxBlockChunkSegmentSize,
 	}, nil
 }
 
@@ -561,7 +567,7 @@ func (c *LeveledCompactor) write(dest string, meta *BlockMeta, blocks ...BlockRe
 	// data of all blocks.
 	var chunkw ChunkWriter
 
-	chunkw, err = chunks.NewWriter(chunkDir(tmp))
+	chunkw, err = chunks.NewWriterWithSegSize(chunkDir(tmp), c.maxBlockChunkSegmentSize)
 	if err != nil {
 		return errors.Wrap(err, "open chunk writer")
 	}
@@ -683,7 +689,7 @@ func (c *LeveledCompactor) populateBlock(blocks []BlockReader, meta *BlockMeta, 
 			if i > 0 && b.Meta().MinTime < globalMaxt {
 				c.metrics.overlappingBlocks.Inc()
 				overlapping = true
-				level.Warn(c.logger).Log("msg", "Found overlapping blocks during compaction", "ulid", meta.ULID)
+				level.Info(c.logger).Log("msg", "Found overlapping blocks during compaction", "ulid", meta.ULID)
 			}
 			if b.Meta().MaxTime > globalMaxt {
 				globalMaxt = b.Meta().MaxTime

@@ -47,6 +47,7 @@ func (m SortVector) Less(i, j int) bool {
 }
 func (m SortVector) Swap(i, j int)      { m.Vector[i], m.Vector[j] = m.Vector[j], m.Vector[i] }
 
+//add by newland
 type Points []Point
 
 func (ls Points) Len() int           { return len(ls) }
@@ -164,6 +165,7 @@ func parseValue(s *Sample, d *OprData) string {
 	return oprdata1
 }
 
+//funcLabelsAppendTagsByTernary
 func funcLabelsAppendTagsByTernary(vals []parser.Value, args parser.Expressions, enh *EvalNodeHelper) Vector {
 	leng := len(args) - 1
 	var (
@@ -177,7 +179,7 @@ func funcLabelsAppendTagsByTernary(vals []parser.Value, args parser.Expressions,
 	}
 
 	for i := 1; i < len(args); i++ {
-		src := args[i].(*parser.StringLiteral).Val
+		src := stringFromArg(args[i])
 		if i%2 == 0 {
 			topr, err := Parse(src)
 			if err != nil {
@@ -225,6 +227,7 @@ func funcLabelsAppendTagsByTernary(vals []parser.Value, args parser.Expressions,
 	return enh.Out
 }
 
+//add by newland
 func funcLabelsAppendTags(vals []parser.Value, args parser.Expressions, enh *EvalNodeHelper) Vector {
 	leng := len(args) - 1
 	var (
@@ -238,7 +241,7 @@ func funcLabelsAppendTags(vals []parser.Value, args parser.Expressions, enh *Eva
 	}
 
 	for i := 1; i < len(args); i++ {
-		src := args[i].(*parser.StringLiteral).Val
+		src := stringFromArg(args[i])
 		if !model.LabelName(src).IsValid() {
 			panic(fmt.Errorf("invalid source label name in labels_append_tags(): %s", src))
 		}
@@ -281,6 +284,7 @@ func funcLabelsAppendTags(vals []parser.Value, args parser.Expressions, enh *Eva
 	return enh.Out
 }
 
+//add by newland
 func funcLabelsRename(vals []parser.Value, args parser.Expressions, enh *EvalNodeHelper) Vector {
 	leng := len(args) - 1
 	var (
@@ -294,7 +298,7 @@ func funcLabelsRename(vals []parser.Value, args parser.Expressions, enh *EvalNod
 	}
 
 	for i := 1; i < len(args); i++ {
-		src := args[i].(*parser.StringLiteral).Val
+		src := stringFromArg(args[i])
 		if !model.LabelName(src).IsValid() {
 			panic(fmt.Errorf("invalid source label name in labels_invert(): %s", src))
 		}
@@ -330,6 +334,7 @@ func funcLabelsRename(vals []parser.Value, args parser.Expressions, enh *EvalNod
 	return enh.Out
 }
 
+//add by newland
 func funcLabelsSelect(vals []parser.Value, args parser.Expressions, enh *EvalNodeHelper) Vector {
 	var (
 		vector    = vals[0].(Vector)
@@ -341,7 +346,7 @@ func funcLabelsSelect(vals []parser.Value, args parser.Expressions, enh *EvalNod
 	}
 
 	for i := 1; i < len(args); i++ {
-		src := args[i].(*parser.StringLiteral).Val
+		src := stringFromArg((args[i]))
 		if !model.LabelName(src).IsValid() {
 			panic(fmt.Errorf("invalid source label name in labels_invert(): %s", src))
 		}
@@ -365,6 +370,7 @@ func funcLabelsSelect(vals []parser.Value, args parser.Expressions, enh *EvalNod
 	return enh.Out
 }
 
+//add by newland
 func funcSelect1(vals []parser.Value, args parser.Expressions, enh *EvalNodeHelper) Vector {
 	leng := len(args) - 1
 	var (
@@ -379,7 +385,7 @@ func funcSelect1(vals []parser.Value, args parser.Expressions, enh *EvalNodeHelp
 	}
 
 	for i := 1; i < len(args); i++ {
-		targetkey, newkey := strutil.SplitString(args[i].(*parser.StringLiteral).Val, ":")
+		targetkey, newkey := strutil.SplitString(stringFromArg(args[i]), ":")
 
 		if !model.LabelName(targetkey).IsValid() {
 			panic(fmt.Errorf("invalid source label name in select1(): %s", targetkey))
@@ -412,6 +418,7 @@ func funcSelect1(vals []parser.Value, args parser.Expressions, enh *EvalNodeHelp
 	return enh.Out
 }
 
+//add by newland
 func funcSelect2(vals []parser.Value, args parser.Expressions, enh *EvalNodeHelper) Vector {
 	leng := len(args) - 3
 	var (
@@ -420,9 +427,9 @@ func funcSelect2(vals []parser.Value, args parser.Expressions, enh *EvalNodeHelp
 		targetKeys = make([]string, leng)
 		newKeys    = make([]string, leng)
 	)
-	srcMatchKey, destMatchKey := strutil.SplitString(args[0].(*parser.StringLiteral).Val, SPLIT_SYMBOL_1)
+	srcMatchKey, destMatchKey := strutil.SplitString(stringFromArg(args[0]), SPLIT_SYMBOL_1)
 	for i := 3; i < len(args); i++ {
-		targetkey, newkey := strutil.SplitString(args[i].(*parser.StringLiteral).Val, ":")
+		targetkey, newkey := strutil.SplitString(stringFromArg(args[i]), ":")
 
 		if !model.LabelName(targetkey).IsValid() {
 			panic(fmt.Errorf("invalid source label name in select_in(): %s", targetkey))
@@ -495,6 +502,7 @@ out:
 	return enh.Out
 }
 
+//add by newland
 func funcLabelsAppend(vals []parser.Value, args parser.Expressions, enh *EvalNodeHelper) Vector {
 	//time.Sleep(time.Millisecond * 500)
 	leng := len(args) - 2
@@ -511,7 +519,7 @@ func funcLabelsAppend(vals []parser.Value, args parser.Expressions, enh *EvalNod
 
 	var matchKey string
 	for i := 2; i < len(args); i++ {
-		src := args[i].(*parser.StringLiteral).Val
+		src := stringFromArg(args[i])
 		if !model.LabelName(src).IsValid() {
 			panic(fmt.Errorf("invalid source label name in labels_invert(): %s", src))
 		}
@@ -602,7 +610,7 @@ out:
 		//			}
 		//		}
 		//		enh.Out = append(enh.Out, el)
-		//		continue Out
+		//		continue out
 		//	}
 		//	//如果找不到匹配的，会剔除el
 		//}
@@ -610,6 +618,7 @@ out:
 	return enh.Out
 }
 
+//add by newland
 func funcSelect2Join(vals []parser.Value, args parser.Expressions, enh *EvalNodeHelper) Vector {
 	leng := len(args) - 3
 	var (
@@ -619,9 +628,9 @@ func funcSelect2Join(vals []parser.Value, args parser.Expressions, enh *EvalNode
 		newKeys    = make([]string, leng)
 	)
 
-	srcMatchKey, destMatchKey := strutil.SplitString(args[0].(*parser.StringLiteral).Val, SPLIT_SYMBOL_1)
+	srcMatchKey, destMatchKey := strutil.SplitString(stringFromArg(args[0]), SPLIT_SYMBOL_1)
 	for i := 3; i < len(args); i++ {
-		targetkey, newkey := strutil.SplitString(args[i].(*parser.StringLiteral).Val, ":")
+		targetkey, newkey := strutil.SplitString(stringFromArg(args[i]), ":")
 
 		if !model.LabelName(targetkey).IsValid() {
 			panic(fmt.Errorf("invalid source label name in select2_join(): %s", targetkey))
@@ -702,7 +711,7 @@ out:
 func funcDistinct(vals []parser.Value, args parser.Expressions, enh *EvalNodeHelper) Vector {
 	var (
 		vector  = vals[0].(Vector)
-		sortKey = args[1].(*parser.StringLiteral).Val
+		sortKey = stringFromArg(args[1])
 	)
 	sort.Sort(SortVector{vector, sortKey})
 
@@ -733,6 +742,7 @@ func funcDistinct(vals []parser.Value, args parser.Expressions, enh *EvalNodeHel
 	return enh.Out
 }
 
+//add by newland
 //这个方法被调用多次，每一个指标调用一次（一个指标有多个监控数据），性能较差
 func funcAggregateMatrixMax(vals []parser.Value, args parser.Expressions, enh *EvalNodeHelper) Vector {
 	var (
@@ -807,6 +817,7 @@ func funcAggregateMatrixSum(vals []parser.Value, args parser.Expressions, enh *E
 	return enh.Out
 }
 
+//add by newland
 func funcLabelsAppendValue(vals []parser.Value, args parser.Expressions, enh *EvalNodeHelper) Vector {
 	var (
 		vector    = vals[0].(Vector)
@@ -819,7 +830,7 @@ func funcLabelsAppendValue(vals []parser.Value, args parser.Expressions, enh *Ev
 	}
 
 	for i := 2; i < len(args); i++ {
-		src := args[i].(*parser.StringLiteral).Val
+		src := stringFromArg(args[i])
 		if !model.LabelName(src).IsValid() {
 			panic(fmt.Errorf("invalid source label name in labels_invert(): %s", src))
 		}
@@ -853,8 +864,8 @@ out:
 
 //funcLabelsAppendValue2  ("pod_name", "cpu|mem", app_cpu_used, app_mem_used)
 func funcLabelsAppendValue2(vals []parser.Value, args parser.Expressions, enh *EvalNodeHelper) Vector {
-	matchKeys := strings.Split(args[0].(*parser.StringLiteral).Val, ",")
-	newKeys := strings.Split(args[1].(*parser.StringLiteral).Val, "|")
+	matchKeys := strings.Split(stringFromArg(args[0]), ",")
+	newKeys := strings.Split(stringFromArg(args[1]), "|")
 
 	vs := make([]Vector, len(args)-2)
 	for i, leng := 2, len(args); i < leng; i++ {
@@ -920,8 +931,8 @@ out:
 }
 
 func funcSelectn(vals []parser.Value, args parser.Expressions, enh *EvalNodeHelper) Vector {
-	matchKeys := strings.Split(args[0].(*parser.StringLiteral).Val, SPLIT_SYMBOL_1)
-	newKeys := strings.Split(args[1].(*parser.StringLiteral).Val, SPLIT_SYMBOL_1)
+	matchKeys := strings.Split(stringFromArg(args[0]), SPLIT_SYMBOL_1)
+	newKeys := strings.Split(stringFromArg(args[1]), SPLIT_SYMBOL_1)
 
 	vs := make([]Vector, len(args)-2)
 	for i, leng := 2, len(args); i < leng; i++ {
@@ -978,7 +989,7 @@ out:
 	return enh.Out
 }
 
-//add by pengsg 通过label 反选指标
+//add by newland 通过label 反选指标
 func funcLabelsInvert(vals []parser.Value, args parser.Expressions, enh *EvalNodeHelper) Vector {
 	var (
 		vector    = vals[0].(Vector)
@@ -990,7 +1001,7 @@ func funcLabelsInvert(vals []parser.Value, args parser.Expressions, enh *EvalNod
 	}
 
 	for i := 1; i < len(args); i++ {
-		src := args[i].(*parser.StringLiteral).Val
+		src := stringFromArg(args[i])
 		if !model.LabelName(src).IsValid() {
 			panic(fmt.Errorf("invalid source label name in labels_invert(): %s", src))
 		}
@@ -1012,7 +1023,7 @@ out:
 	return enh.Out
 }
 
-// === Vector(s Scalar) Vector === //pengsg
+// === Vector(s Scalar) Vector === //newland
 func funcVectorWithLabels(vals []parser.Value, args parser.Expressions, enh *EvalNodeHelper) Vector {
 
 	var (
@@ -1023,7 +1034,7 @@ func funcVectorWithLabels(vals []parser.Value, args parser.Expressions, enh *Eva
 	var isKey = true
 	var l *labels.Label
 	for i := 1; i < len(args); i++ {
-		src := args[i].(*parser.StringLiteral).Val
+		src := stringFromArg(args[i])
 		if isKey {
 			if !model.LabelName(src).IsValid() {
 				panic(fmt.Errorf("invalid source label name in vector_with_labels(): %s", src))
